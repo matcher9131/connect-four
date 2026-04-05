@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  dev:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.dev
+    volumes:
+      # Source code (bind mounts for hot reload)
+      - ../nextjs:/app/nextjs
+      - ../rust-wasm:/app/rust-wasm
+
+      # Named volumes for dependencies (performance optimization)
+      - node_modules:/app/nextjs/node_modules
+      - cargo_registry:/root/.cargo/registry
+      - cargo_git:/root/.cargo/git
+      - rust_target:/app/rust-wasm/target
+
+    ports:
+      - "3000:3000"
+
+    working_dir: /app
+
+    # Keep container running for development
+    command: tail -f /dev/null
+
+    environment:
+      - NODE_ENV=development
+      - RUST_BACKTRACE=1
+
+    stdin_open: true
+    tty: true
+
+volumes:
+  node_modules:
+  cargo_registry:
+  cargo_git:
+  rust_target:
