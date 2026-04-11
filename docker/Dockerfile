@@ -1,7 +1,7 @@
 # Production Dockerfile for Next.js + Rust/WASM
 
 # Stage 1: Rust Builder
-FROM rust:1.85-bullseye as rust-builder
+FROM rust:1.88-bullseye as rust-builder
 
 # Install wasm-pack
 RUN curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh -s -- -f

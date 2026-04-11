@@ -5,7 +5,7 @@
 - **Node.js**: v22
 - **Next.js**: v15
 - **React**: v19
-- **Rust**: v1.85
+- **Rust**: v1.88
 - **wasm-pack**: 最新版（固定）
 - **wasm-bindgen**: v0.2.99
 
