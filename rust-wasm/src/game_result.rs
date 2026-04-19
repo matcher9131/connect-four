@@ -71,3 +71,50 @@ pub fn black_wins(board: u64, col_index: i32, row_index: i32) -> bool {
     let sided_board = board ^ mask;
     return wins(sided_board, col_index, row_index);
 }
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use rstest::rstest;
+
+    // 列i・行jのビット位置: 8*i + j
+    const VERT_WIN: u64 = 0x0F;                      // col 0, rows 0-3
+    const HORIZ_WIN: u64 = 0x0101_0101;              // row 0, cols 0-3
+    // (col,row): (0,0)→(1,1)→(2,2)→(3,3): bits 0,9,18,27
+    const DIAG_UR_WIN: u64 = (1u64 << 0) | (1u64 << 9) | (1u64 << 18) | (1u64 << 27);
+    // (col,row): (0,3)→(1,2)→(2,1)→(3,0): bits 3,10,17,24
+    const DIAG_LR_WIN: u64 = (1u64 << 3) | (1u64 << 10) | (1u64 << 17) | (1u64 << 24);
+
+    #[rstest]
+    // 縦4連: col 0, rows 0-3
+    #[case(VERT_WIN, 0, 0, true)]
+    #[case(VERT_WIN, 0, 3, true)]
+    // 縦4連: col 0, rows 3-6 (0x78 = bits 3,4,5,6)
+    #[case(0x78u64, 0, 3, true)]
+    #[case(0x78u64, 0, 6, true)]
+    // 横4連: row 0, cols 0-3
+    #[case(HORIZ_WIN, 0, 0, true)]
+    #[case(HORIZ_WIN, 3, 0, true)]
+    // 横4連: row 0, cols 3-6
+    #[case(HORIZ_WIN << 24, 3, 0, true)]
+    #[case(HORIZ_WIN << 24, 6, 0, true)]
+    // 右上がり斜め4連: (0,0)-(3,3)
+    #[case(DIAG_UR_WIN, 0, 0, true)]
+    #[case(DIAG_UR_WIN, 3, 3, true)]
+    // 右上がり斜め4連: (0,1)-(3,4)
+    #[case(DIAG_UR_WIN << 1, 2, 3, true)]
+    #[case(DIAG_UR_WIN << 1, 3, 4, true)]
+    // 右下がり斜め4連: (0,3)-(3,0)
+    #[case(DIAG_LR_WIN, 0, 3, true)]
+    #[case(DIAG_LR_WIN, 3, 0, true)]
+    // 非勝利: 空盤面
+    #[case(0u64, 0, 0, false)]
+    // 非勝利: col 0 に3連のみ
+    #[case(0x07u64, 0, 2, false)]
+    // 非勝利: row 0 に横3連のみ (cols 0-2: bits 0,8,16)
+    #[case((1u64 << 0) | (1u64 << 8) | (1u64 << 16), 0, 0, false)]
+    fn test_wins(#[case] board: u64, #[case] col: i32, #[case] row: i32, #[case] expected: bool) {
+        assert_eq!(wins(board, col, row), expected);
+    }
+}
