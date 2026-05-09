@@ -1,40 +1,30 @@
 mod constants;
 mod utils;
 mod game_result;
+mod game_move;
 
 use wasm_bindgen::prelude::*;
+use serde::{Serialize};
+use game_result::{black_wins, white_wins};
+use game_move::{get_next_row_index, get_next_board, MoveResult};
 
-// When the `wee_alloc` feature is enabled, use `wee_alloc` as the global allocator.
-// #[cfg(feature = "wee_alloc")]
-// #[global_allocator]
-// static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
-
-/// Sample function to demonstrate WASM is working
+/// コマを置いて次の局面を得る
 #[wasm_bindgen]
-pub fn greet(name: &str) -> String {
-    format!("Hello, {}! WASM is working!", name)
-}
+pub fn put_piece(board: u64, is_black: bool, col_index: i32) -> JsValue {
+    let row_index = get_next_row_index(board, col_index);
+    assert!(row_index >= 0);
 
-/// Add two numbers
-#[wasm_bindgen]
-pub fn add(a: i32, b: i32) -> i32 {
-    a + b
-}
+    let next_board = get_next_board(board, is_black, col_index);
+    let game_result = if is_black && black_wins(next_board, col_index, row_index) { -1 }
+        else if !is_black && white_wins(next_board, col_index, row_index) { 1 }
+        else { 0 };
+    
+    let move_result = MoveResult {
+        board: next_board,
+        game_result: game_result
+    };
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_add() {
-        assert_eq!(add(2, 3), 5);
-        assert_eq!(add(-1, 1), 0);
-    }
-
-    #[test]
-    fn test_greet() {
-        let result = greet("World");
-        assert!(result.contains("Hello, World!"));
-        assert!(result.contains("WASM is working!"));
-    }
+    let serializer = serde_wasm_bindgen::Serializer::new()
+        .serialize_large_number_types_as_bigints(true);
+    return move_result.serialize(&serializer).unwrap();
 }
