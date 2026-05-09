@@ -1,3 +1,4 @@
+/// 8ビットごとに区切り、それぞれの最上位ビット以下を全て1で埋めたものを返す
 pub fn bit_parallel_fill_right(x: u64) -> u64 {
     let mut y = x;
     y |= (y & 0xFEFE_FEFE_FEFE_FEFE) >> 1;

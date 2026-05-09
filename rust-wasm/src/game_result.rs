@@ -59,12 +59,24 @@ fn wins(sided_board: u64, col_index: i32, row_index: i32) -> bool {
     return false;
 }
 
+/// 現在の局面から特定の位置に白のコマを置くと白が勝利条件を満たすかどうかを返す
+/// 
+/// # Arguments
+/// - `board` - 局面
+/// - `col_index` - コマを置く列
+/// - `row_index` - コマを置く行
 pub fn white_wins(board: u64, col_index: i32, row_index: i32) -> bool {
     let mask = bit_parallel_fill_right(board);
     let sided_board = board ^ mask;
     return wins(sided_board, col_index, row_index);
 }
 
+/// 現在の局面から特定の位置に黒のコマを置くと黒が勝利条件を満たすかどうかを返す
+/// 
+/// # Arguments
+/// - `board` - 局面
+/// - `col_index` - コマを置く列
+/// - `row_index` - コマを置く行
 pub fn black_wins(board: u64, col_index: i32, row_index: i32) -> bool {
     let mut mask = bit_parallel_fill_right(board);
     mask ^= (mask & 0xFEFE_FEFE_FEFE_FEFE) >> 1;
@@ -79,8 +91,8 @@ mod tests {
     use rstest::rstest;
 
     // 列i・行jのビット位置: 8*i + j
-    const VERT_WIN: u64 = 0x0F;                      // col 0, rows 0-3
-    const HORIZ_WIN: u64 = 0x0101_0101;              // row 0, cols 0-3
+    const VERT_WIN: u64 = 0x0F;         // col 0, rows 0-3
+    const HORIZ_WIN: u64 = 0x0101_0101; // row 0, cols 0-3
     // (col,row): (0,0)→(1,1)→(2,2)→(3,3): bits 0,9,18,27
     const DIAG_UR_WIN: u64 = (1u64 << 0) | (1u64 << 9) | (1u64 << 18) | (1u64 << 27);
     // (col,row): (0,3)→(1,2)→(2,1)→(3,0): bits 3,10,17,24
@@ -90,7 +102,7 @@ mod tests {
     // 縦4連: col 0, rows 0-3
     #[case(VERT_WIN, 0, 0, true)]
     #[case(VERT_WIN, 0, 3, true)]
-    // 縦4連: col 0, rows 3-6 (0x78 = bits 3,4,5,6)
+    // 縦4連: col 0, rows 3-6 (0x78 = bits 3-6)
     #[case(0x78u64, 0, 3, true)]
     #[case(0x78u64, 0, 6, true)]
     // 横4連: row 0, cols 0-3
