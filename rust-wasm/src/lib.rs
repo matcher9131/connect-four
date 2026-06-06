@@ -2,11 +2,13 @@ mod constants;
 mod utils;
 mod game_result;
 mod game_move;
+mod convert;
 
 use wasm_bindgen::prelude::*;
 use serde::{Serialize};
 use game_result::{black_wins, white_wins};
 use game_move::{get_next_row_index, get_next_board, MoveResult};
+use convert::{to_js_board};
 
 /// コマを置いて次の局面を得る
 #[wasm_bindgen]
@@ -20,7 +22,7 @@ pub fn put_piece(board: u64, is_black: bool, col_index: i32) -> JsValue {
         else { 0 };
     
     let move_result = MoveResult {
-        board: next_board,
+        board: to_js_board(next_board),
         game_result: game_result
     };
 

@@ -1,11 +1,11 @@
-use wasm_bindgen::prelude::*;
 use serde::{Serialize};
 
-#[wasm_bindgen]
+use crate::constants::Piece;
+
 #[derive(Serialize)]
 pub struct MoveResult {
     /// 次の局面
-    pub board: u64,
+    pub board: Vec<Piece>,
 
     /// 先手勝ちなら`1`、後手勝ちなら`-1`、未決着なら`0`
     pub game_result: i32
