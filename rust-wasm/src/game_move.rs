@@ -13,17 +13,18 @@ pub struct MoveResult {
 
 /// 次に指定した列にコマを置く場合、それが何行目になるかを返す
 /// 置けないときは`-1`を返す
-pub fn get_next_row_index(board: u64, col_index: i32) -> i32 {
+fn get_next_row_index(board: u64, col_index: i32) -> i32 {
     let col = (board >> (8 * col_index)) & 0xFFu64;
     let row_index = col.ilog2() as i32;
     return if row_index < 7 { row_index } else { -1 };
 }
 
 /// 次の局面を作って返す
-pub fn get_next_board(board: u64, is_black: bool, col_index: i32) -> u64 {
+pub fn get_next_board(board: u64, is_black: bool, col_index: i32) -> Option<u64> {
     let row_index = get_next_row_index(board, col_index);
+    if row_index == -1 { return None }
     let piece_bits = if is_black { 0 } else { 1u64 << (8 * col_index + row_index) };
-    return (board ^ piece_bits) | (1u64 << (8 * col_index + row_index + 1));
+    return Some((board ^ piece_bits) | (1u64 << (8 * col_index + row_index + 1)));
 }
 
 #[cfg(test)]
@@ -66,35 +67,43 @@ mod tests {
     #[rstest]
     // 空の列0(センチネルbit 0)に黒コマ → センチネルbit 1 + 元のbit 0(黒=1)はそのまま
     // bit 0 = 1(黒), bit 1 = 1(センチネル) → 0x03
-    #[case(EMPTY_COL0, true, 0, 0x03u64)]
+    #[case(EMPTY_COL0, true, 0, Some(0x03u64))]
     // 空の列0に白コマ → センチネルがbit 1へ移動、bit 0 = 0(白)
     // bit 0 XOR 1 = 0(白), bit 1 = 1(センチネル) → 0x02
-    #[case(EMPTY_COL0, false, 0, 0x02u64)]
+    #[case(EMPTY_COL0, false, 0, Some(0x02u64))]
     // 列0(黒コマ行0+センチネルbit 1)に黒コマ → センチネルbit 2追加
     // 0x03 | 0x04 = 0x07
-    #[case(0x03u64, true, 0, 0x07u64)]
+    #[case(0x03u64, true, 0, Some(0x07u64))]
     // 列0(黒コマ行0+センチネルbit 1)に白コマ
     // bit 1 XOR 1 = 0(白), bit 2 = 1(センチネル), bit 0 = 1(黒) → 0x05
-    #[case(0x03u64, false, 0, 0x05u64)]
+    #[case(0x03u64, false, 0, Some(0x05u64))]
     // 列0(白コマ行0+センチネルbit 1)に黒コマ
     // 0x02 | 0x04 = 0x06
-    #[case(0x02u64, true, 0, 0x06u64)]
+    #[case(0x02u64, true, 0, Some(0x06u64))]
     // 列0(白コマ行0+センチネルbit 1)に白コマ
     // bit 1 XOR 1 = 0(白), bit 2 = 1(センチネル) → 0x04
-    #[case(0x02u64, false, 0, 0x04u64)]
+    #[case(0x02u64, false, 0, Some(0x04u64))]
     // 別の列: 列1(センチネルbit 8)に黒コマ
     // bit 8 = 1(黒), bit 9 = 1(センチネル) → 0x0300
-    #[case(0x0100u64, true, 1, 0x0300u64)]
+    #[case(0x0100u64, true, 1, Some(0x0300u64))]
     // 列1(センチネルbit 8)に白コマ → 0x0200
-    #[case(0x0100u64, false, 1, 0x0200u64)]
+    #[case(0x0100u64, false, 1, Some(0x0200u64))]
     // 他の列は変化しない: 列0と列1が混在
-    #[case(0x0101u64, true, 0, 0x0103u64)]  // 列1は変化なし
-    #[case(0x0101u64, true, 1, 0x0301u64)]  // 列0は変化なし
+    #[case(0x0101u64, true, 0, Some(0x0103u64))]  // 列1は変化なし
+    #[case(0x0101u64, true, 1, Some(0x0301u64))]  // 列0は変化なし
+    // 列0が満杯(センチネルがbit 7) → None
+    #[case(0x80u64, true, 0, None)]
+    #[case(0x80u64, false, 0, None)]
+    // 列1が満杯(センチネルがbit 15) → None
+    #[case(0x8000u64, true, 1, None)]
+    #[case(0x8000u64, false, 1, None)]
+    // 他の列は満杯でも対象列が空なら置ける
+    #[case(0x8001u64, true, 0, Some(0x8003u64))]  // 列1満杯・列0空 → 列0に黒コマ
     fn test_get_next_board(
         #[case] board: u64,
         #[case] is_black: bool,
         #[case] col_index: i32,
-        #[case] expected: u64,
+        #[case] expected: Option<u64>,
     ) {
         assert_eq!(get_next_board(board, is_black, col_index), expected);
     }

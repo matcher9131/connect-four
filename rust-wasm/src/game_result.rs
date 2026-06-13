@@ -70,14 +70,19 @@ pub fn get_black_sided_board(board: u64) -> u64 {
     return board ^ mask;
 }
 
+fn get_top_row_index(board: u64, col_index: i32) -> i32 {
+    let col = (board >> (8 * col_index)) & 0xFFu64;
+    return col.ilog2() as i32 - 1;
+}
+
 /// 現在の局面から特定の位置に白のコマを置くと白が勝利条件を満たすかどうかを返す
 /// 
 /// # Arguments
 /// - `board` - 局面
 /// - `col_index` - コマを置く列
-/// - `row_index` - コマを置く行
-pub fn white_wins(board: u64, col_index: i32, row_index: i32) -> bool {
+pub fn white_wins(board: u64, col_index: i32) -> bool {
     let sided_board = get_white_sided_board(board);
+    let row_index = get_top_row_index(board, col_index);
     return wins(sided_board, col_index, row_index);
 }
 
@@ -86,9 +91,9 @@ pub fn white_wins(board: u64, col_index: i32, row_index: i32) -> bool {
 /// # Arguments
 /// - `board` - 局面
 /// - `col_index` - コマを置く列
-/// - `row_index` - コマを置く行
-pub fn black_wins(board: u64, col_index: i32, row_index: i32) -> bool {
+pub fn black_wins(board: u64, col_index: i32) -> bool {
     let sided_board = get_black_sided_board(board);
+    let row_index = get_top_row_index(board, col_index);
     return wins(sided_board, col_index, row_index);
 }
 
