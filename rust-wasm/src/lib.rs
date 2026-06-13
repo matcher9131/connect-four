@@ -7,18 +7,17 @@ mod convert;
 use wasm_bindgen::prelude::*;
 use serde::{Serialize};
 use game_result::{black_wins, white_wins};
-use game_move::{get_next_row_index, get_next_board, MoveResult};
+use game_move::{get_next_board, MoveResult};
 use convert::{to_js_board};
 
 /// コマを置いて次の局面を得る
 #[wasm_bindgen]
 pub fn put_piece(board: u64, is_black: bool, col_index: i32) -> JsValue {
-    let row_index = get_next_row_index(board, col_index);
-    assert!(row_index >= 0);
+    let optional_next_board = get_next_board(board, is_black, col_index);
+    let next_board = optional_next_board.expect("optional_next_board is None");
 
-    let next_board = get_next_board(board, is_black, col_index);
-    let game_result = if is_black && black_wins(next_board, col_index, row_index) { -1 }
-        else if !is_black && white_wins(next_board, col_index, row_index) { 1 }
+    let game_result = if is_black && black_wins(next_board, col_index) { -1 }
+        else if !is_black && white_wins(next_board, col_index) { 1 }
         else { 0 };
     
     let move_result = MoveResult {
