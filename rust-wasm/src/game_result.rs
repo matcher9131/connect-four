@@ -59,6 +59,17 @@ fn wins(sided_board: u64, col_index: i32, row_index: i32) -> bool {
     return false;
 }
 
+pub fn get_white_sided_board(board: u64) -> u64 {
+    let mask = bit_parallel_fill_right(board);
+    return board ^ mask;
+}
+
+pub fn get_black_sided_board(board: u64) -> u64 {
+    let mut mask = bit_parallel_fill_right(board);
+    mask ^= (mask & 0xFEFE_FEFE_FEFE_FEFE) >> 1;
+    return board ^ mask;
+}
+
 /// 現在の局面から特定の位置に白のコマを置くと白が勝利条件を満たすかどうかを返す
 /// 
 /// # Arguments
@@ -66,8 +77,7 @@ fn wins(sided_board: u64, col_index: i32, row_index: i32) -> bool {
 /// - `col_index` - コマを置く列
 /// - `row_index` - コマを置く行
 pub fn white_wins(board: u64, col_index: i32, row_index: i32) -> bool {
-    let mask = bit_parallel_fill_right(board);
-    let sided_board = board ^ mask;
+    let sided_board = get_white_sided_board(board);
     return wins(sided_board, col_index, row_index);
 }
 
@@ -78,9 +88,7 @@ pub fn white_wins(board: u64, col_index: i32, row_index: i32) -> bool {
 /// - `col_index` - コマを置く列
 /// - `row_index` - コマを置く行
 pub fn black_wins(board: u64, col_index: i32, row_index: i32) -> bool {
-    let mut mask = bit_parallel_fill_right(board);
-    mask ^= (mask & 0xFEFE_FEFE_FEFE_FEFE) >> 1;
-    let sided_board = board ^ mask;
+    let sided_board = get_black_sided_board(board);
     return wins(sided_board, col_index, row_index);
 }
 
