@@ -13,7 +13,7 @@ pub struct MoveResult {
 
 /// 次に指定した列にコマを置く場合、それが何行目になるかを返す
 /// 置けないときは`-1`を返す
-fn get_next_row_index(board: u64, col_index: i32) -> i32 {
+pub fn get_next_row_index(board: u64, col_index: i32) -> i32 {
     let col = (board >> (8 * col_index)) & 0xFFu64;
     let row_index = col.ilog2() as i32;
     return if row_index < 7 { row_index } else { -1 };

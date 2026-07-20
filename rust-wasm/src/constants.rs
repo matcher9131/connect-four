@@ -10,3 +10,6 @@ pub enum Piece {
     White = 1u8,
     Black = 2u8,
 }
+
+pub const NUM_ITERATION: u32 = 100_000;
+pub const EXPLORATION_CONSTANT: f64 = 1.4;

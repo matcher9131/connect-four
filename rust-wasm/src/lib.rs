@@ -3,6 +3,8 @@ mod utils;
 mod game_result;
 mod game_move;
 mod convert;
+mod engine_base;
+mod engine_impl;
 
 use wasm_bindgen::prelude::*;
 use serde::{Serialize};
