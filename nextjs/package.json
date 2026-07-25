@@ -7,20 +7,23 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "wasm:build": "cd ../rust-wasm && wasm-pack build --target web --out-dir pkg",
-    "wasm:build:release": "cd ../rust-wasm && wasm-pack build --target web --release --out-dir pkg"
+    "wasm:build": "cd ../rust-wasm && wasm-pack build --target web --out-dir pkg && cd ../nextjs && mkdir -p public/wasm && cp ../rust-wasm/pkg/connect_four_wasm.js ../rust-wasm/pkg/connect_four_wasm_bg.wasm public/wasm",
+    "wasm:build:release": "cd ../rust-wasm && wasm-pack build --target web --release --out-dir pkg && cd ../nextjs && mkdir -p public/wasm && cp ../rust-wasm/pkg/connect_four_wasm.js ../rust-wasm/pkg/connect_four_wasm_bg.wasm public/wasm"
   },
   "dependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
     "next": "15.1.6",
+    "postcss": "^8.5.23",
     "react": "19.0.0",
-    "react-dom": "19.0.0"
+    "react-dom": "19.0.0",
+    "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
     "@types/node": "^22.10.5",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
-    "typescript": "^5.7.3",
     "eslint": "^9.18.0",
-    "eslint-config-next": "15.1.6"
+    "eslint-config-next": "15.1.6",
+    "typescript": "^5.7.3"
   }
 }
