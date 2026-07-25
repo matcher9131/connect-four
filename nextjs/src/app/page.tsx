@@ -1,9 +1,8 @@
+import Board from "./_components/Board";
+
 export default function Home() {
-  return (
-    <main style={{ padding: '2rem' }}>
-      <h1>Connect Four</h1>
-      <p>Next.js 15 + React 19 + Rust/WASM</p>
-      <p>Environment ready for development!</p>
+    return <main>
+        <div className="text-xl">Connect-Four</div>
+        <Board />
     </main>
-  );
 }
