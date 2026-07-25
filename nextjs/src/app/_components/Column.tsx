@@ -1,7 +1,7 @@
 import Cell from "./Cell";
 
 type ColumnProps = {
-    readonly pieces: readonly number[];
+    readonly pieces: readonly number[]
     readonly onClick: () => void;
 };
 

@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "wasm:build": "cd ../rust-wasm && wasm-pack build --target web --out-dir pkg",
-    "wasm:build:release": "cd ../rust-wasm && wasm-pack build --target web --release --out-dir pkg"
+    "wasm:build": "cd ../rust-wasm && wasm-pack build --target web --out-dir pkg && cd ../nextjs && mkdir -p public/wasm && cp ../rust-wasm/pkg/connect_four_wasm.js ../rust-wasm/pkg/connect_four_wasm_bg.wasm public/wasm",
+    "wasm:build:release": "cd ../rust-wasm && wasm-pack build --target web --release --out-dir pkg && cd ../nextjs && mkdir -p public/wasm && cp ../rust-wasm/pkg/connect_four_wasm.js ../rust-wasm/pkg/connect_four_wasm_bg.wasm public/wasm"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.3.3",
