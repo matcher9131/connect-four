@@ -134,19 +134,26 @@ impl<S: GameState> Node<S> {
 
 pub fn mcts_search<S: GameState>(
     root_state: S,
-    iterations: u32,
     c: f64,
     rng: &mut impl Rng,
-) -> S::Action {
+    mut should_stop: impl FnMut(u32) -> bool,
+) -> Option<S::Action> {
     let mut root = Node::new(root_state, None);
+
+    let mut iterations: u32 = 0;
+    loop {
+        root.iterate(c, rng);
+        iterations += 1;
+        if should_stop(iterations) {
+            break;
+        }
+    }
 
     for _ in 0..iterations {
         root.iterate(c, rng);
     }
 
-    let best = root.children.iter()
+    root.children.iter()
         .max_by_key(|child| child.visits)
-        .expect("No legal moves");
-
-    best.action.expect("Child must have an action.")
+        .and_then(|best| best.action)
 }

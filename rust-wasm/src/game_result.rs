@@ -1,4 +1,5 @@
 use crate::constants::{BOARD_SIZE, NUM_CONNECTION};
+use crate::game_move::board_is_full;
 use crate::utils::{bit_parallel_fill_right};
 
 const UPPER_LIMIT: i32 = BOARD_SIZE - NUM_CONNECTION;
@@ -97,6 +98,18 @@ pub fn black_wins(board: u64, col_index: i32) -> bool {
     return wins(sided_board, col_index, row_index);
 }
 
+/// コマが置かれた直後の局面から`game_result`を得る
+/// 
+/// # Arguments
+/// - `board` - 局面
+/// - `last_is_black` - 直前の手番が後手かどうか
+/// - `last_col_index` - 直前にコマが置かれた列番号
+pub fn get_game_result(board: u64, last_is_black: bool, last_col_index: i32) -> i32 {
+    if last_is_black && black_wins(board, last_col_index) { -1 }
+    else if !last_is_black && white_wins(board, last_col_index) { 1 }
+    else if board_is_full(board) { 2 }
+    else { 0 }
+}
 
 #[cfg(test)]
 mod tests {
