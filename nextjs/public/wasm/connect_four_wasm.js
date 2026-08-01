@@ -1,6 +1,21 @@
 /* @ts-self-types="./connect_four_wasm.d.ts" */
 
 /**
+ * CPUに思考させて指し手を反映した局面を返す
+ * @param {Uint8Array} js_board
+ * @param {boolean} cpu_is_black
+ * @param {number} time_limit_ms
+ * @param {number} seed
+ * @returns {any}
+ */
+export function get_next_board_by_cpu(js_board, cpu_is_black, time_limit_ms, seed) {
+    const ptr0 = passArray8ToWasm0(js_board, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.get_next_board_by_cpu(ptr0, len0, cpu_is_black, time_limit_ms, seed);
+    return ret;
+}
+
+/**
  * コマを置いて次の局面を得る
  * @param {Uint8Array} js_board
  * @param {boolean} is_black
@@ -32,6 +47,10 @@ function __wbg_get_imports() {
         },
         __wbg_new_36e147a8ced3c6e0: function() {
             const ret = new Array();
+            return ret;
+        },
+        __wbg_now_d2e0afbad4edbe82: function() {
+            const ret = Date.now();
             return ret;
         },
         __wbg_set_6be42768c690e380: function(arg0, arg1, arg2) {
