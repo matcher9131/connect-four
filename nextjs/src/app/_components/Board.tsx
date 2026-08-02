@@ -53,8 +53,8 @@ export default function Board() {
         : "あなたの番です";
 
     return (
-        <div>
-            <div className="relative isolate aspect-square w-full max-w-[560px] select-none">
+        <div className="w-full max-w-[560px] select-none">
+            <div className="relative isolate aspect-square w-full">
                 <BackgroundLayer />
                 <PiecesLayer
                     disabled={disabled}
@@ -69,12 +69,8 @@ export default function Board() {
                     onHoveredColIndexChangeFactory={setHoveredColIndexFactory}
                     onColumnClickFactory={handleColumnClick}
                 />
-                {gameResult !== 0 && <div className="absolute z-40 left-0 top-0 w-full h-full flex justify-center items-center text-3xl">
-                    <div className="bg-white/[0.5] p-2">{`${gameResult === 1 ? "先手" : "後手"}の勝ち`}</div>
-                </div>}
             </div>
-            <div className="w-full text-center">{message}</div>
+            <div className="w-full text-center text-2xl">{message}</div>
         </div>
-        
     );
 }
