@@ -13,3 +13,4 @@ pub enum Piece {
 
 pub const NUM_ITERATION: u32 = 100_000;
 pub const EXPLORATION_CONSTANT: f64 = 1.4;
+pub const CLOCK_CHCECK_INTERVAL: u32 = 1024;

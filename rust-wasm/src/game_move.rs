@@ -1,13 +1,13 @@
 use serde::{Serialize};
 
-use crate::constants::Piece;
+use crate::constants::{BOARD_SIZE, Piece};
 
 #[derive(Serialize)]
 pub struct MoveResult {
     /// 次の局面
     pub board: Vec<Piece>,
 
-    /// 先手勝ちなら`1`、後手勝ちなら`-1`、未決着なら`0`
+    /// 先手勝ちなら`1`、後手勝ちなら`-1`、未決着なら`0`、引き分けなら`2`
     pub game_result: i32
 }
 
@@ -25,6 +25,11 @@ pub fn get_next_board(board: u64, is_black: bool, col_index: i32) -> Option<u64>
     if row_index == -1 { return None }
     let piece_bits = if is_black { 0 } else { 1u64 << (8 * col_index + row_index) };
     return Some((board ^ piece_bits) | (1u64 << (8 * col_index + row_index + 1)));
+}
+
+/// すべての列がコマで埋まっているか
+pub fn board_is_full(board: u64) -> bool {
+    (0..BOARD_SIZE).all(|col_index| get_next_row_index(board, col_index) == -1)
 }
 
 #[cfg(test)]
