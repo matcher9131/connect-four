@@ -37,13 +37,20 @@ export default function Board() {
         if (putPieceResult.game_result !== 0) return;
 
         setCpuIsThinking(true);
-        const cpuResult = await getNextBoardByCpu(new Uint8Array(putPieceResult.board), !isBlack, 2000, Date.now() >>> 0);
+        const cpuResult = await getNextBoardByCpu(new Uint8Array(putPieceResult.board), !isBlack, 5000, Date.now() >>> 0);
         setPieces(cpuResult.board);
         setGameResult(cpuResult.game_result);
+        setCpuIsThinking(false);
         if (cpuResult.game_result === 0) {
             setCanColumnClick(true);
         }
     };
+
+    const message = gameResult === 1 ? "あなたの勝ち"
+        : gameResult === -1 ? "CPUの勝ち"
+        : gameResult === 2 ? "引き分け"
+        : cpuIsThinking ? "CPU思考中"
+        : "あなたの番です";
 
     return (
         <div>
@@ -66,7 +73,7 @@ export default function Board() {
                     <div className="bg-white/[0.5] p-2">{`${gameResult === 1 ? "先手" : "後手"}の勝ち`}</div>
                 </div>}
             </div>
-            <div className="w-full text-center">{cpuIsThinking ? "CPU思考中" : "あなたの番です"}</div>
+            <div className="w-full text-center">{message}</div>
         </div>
         
     );

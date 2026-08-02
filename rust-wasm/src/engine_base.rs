@@ -149,10 +149,6 @@ pub fn mcts_search<S: GameState>(
         }
     }
 
-    for _ in 0..iterations {
-        root.iterate(c, rng);
-    }
-
     root.children.iter()
         .max_by_key(|child| child.visits)
         .and_then(|best| best.action)

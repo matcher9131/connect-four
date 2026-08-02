@@ -1,5 +1,5 @@
 use crate::constants::{BOARD_SIZE, NUM_CONNECTION};
-use crate::game_move::board_is_full;
+use crate::game_move::{board_is_full, get_next_board};
 use crate::utils::{bit_parallel_fill_right};
 
 const UPPER_LIMIT: i32 = BOARD_SIZE - NUM_CONNECTION;
@@ -76,22 +76,22 @@ fn get_top_row_index(board: u64, col_index: i32) -> i32 {
     return col.ilog2() as i32 - 1;
 }
 
-/// 現在の局面から特定の位置に白のコマを置くと白が勝利条件を満たすかどうかを返す
+/// 直前に`col_index`に置かれたコマによって白が勝利条件を満たしたかどうかを返す
 /// 
 /// # Arguments
-/// - `board` - 局面
-/// - `col_index` - コマを置く列
+/// - `board` - コマを置いた後の局面
+/// - `col_index` - 直前にコマを置いた列
 pub fn white_wins(board: u64, col_index: i32) -> bool {
     let sided_board = get_white_sided_board(board);
     let row_index = get_top_row_index(board, col_index);
     return wins(sided_board, col_index, row_index);
 }
 
-/// 現在の局面から特定の位置に黒のコマを置くと黒が勝利条件を満たすかどうかを返す
+/// 直前に`col_index`に置かれたコマによって黒が勝利条件を満たしたかどうかを返す
 /// 
 /// # Arguments
-/// - `board` - 局面
-/// - `col_index` - コマを置く列
+/// - `board` - コマを置いた後の局面
+/// - `col_index` - 直前にコマを置いた列
 pub fn black_wins(board: u64, col_index: i32) -> bool {
     let sided_board = get_black_sided_board(board);
     let row_index = get_top_row_index(board, col_index);
@@ -101,14 +101,21 @@ pub fn black_wins(board: u64, col_index: i32) -> bool {
 /// コマが置かれた直後の局面から`game_result`を得る
 /// 
 /// # Arguments
-/// - `board` - 局面
+/// - `board` - コマを置いた後の局面
 /// - `last_is_black` - 直前の手番が後手かどうか
-/// - `last_col_index` - 直前にコマが置かれた列番号
+/// - `last_col_index` - 直前にコマが置かれた列
 pub fn get_game_result(board: u64, last_is_black: bool, last_col_index: i32) -> i32 {
     if last_is_black && black_wins(board, last_col_index) { -1 }
     else if !last_is_black && white_wins(board, last_col_index) { 1 }
     else if board_is_full(board) { 2 }
     else { 0 }
+}
+
+pub fn wins_if_put(board: u64, is_black: bool, col_index: i32) -> bool {
+    match get_next_board(board, is_black, col_index) {
+        Some(next_board) => if is_black { black_wins(next_board, col_index) } else { white_wins(next_board, col_index) }
+        None => false
+    }
 }
 
 #[cfg(test)]

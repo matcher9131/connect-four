@@ -21,7 +21,7 @@ pub fn put_piece(js_board: &[u8], is_black: bool, col_index: i32) -> JsValue {
     let next_board = get_next_board(board, is_black, col_index).expect("optional_next_board is None");
     let move_result = MoveResult {
         board: to_js_board(next_board),
-        game_result: get_game_result(board, is_black, col_index)
+        game_result: get_game_result(next_board, is_black, col_index)
     };
 
     let serializer = serde_wasm_bindgen::Serializer::new()
@@ -37,7 +37,7 @@ pub fn get_next_board_by_cpu(js_board: &[u8], cpu_is_black: bool, time_limit_ms:
     let next_board = get_next_board(board, cpu_is_black, col_index).expect("board cannot be full");
     let move_result = MoveResult {
         board: to_js_board(next_board),
-        game_result: get_game_result(board, cpu_is_black, col_index)
+        game_result: get_game_result(next_board, cpu_is_black, col_index)
     };
 
     let serializer = serde_wasm_bindgen::Serializer::new()
