@@ -25,9 +25,6 @@ export function useEngine() {
         if (workerRef.current == null) {
             const worker = new Worker(new URL("./engine.worker.ts", import.meta.url), { type: "module" });
             worker.onmessage = (e: MessageEvent<EngineResponse>) => {
-                //
-                console.log(e.data)
-                //
                 const pending = pendingRef.current.get(e.data.id);
                 if (pending == null) return;
                 pendingRef.current.delete(e.data.id);
@@ -50,9 +47,11 @@ export function useEngine() {
     }, [rejectAll]);
 
     useEffect(() => {
-        workerRef.current?.terminate();
-        workerRef.current = null;
-        rejectAll(new Error("Engine worker terminated"));
+        return () => {
+            workerRef.current?.terminate();
+            workerRef.current = null;
+            rejectAll(new Error("Engine worker terminated"));
+        };
     }, [rejectAll]);
 
     const putPiece = useCallback((

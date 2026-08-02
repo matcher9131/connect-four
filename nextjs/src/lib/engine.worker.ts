@@ -13,9 +13,6 @@ self.onmessage = async (e) => {
         if (e.data.type === "human") {
             const { board, isBlack, colIndex } = e.data;
             const result = wasm.put_piece(board, isBlack, colIndex) as MoveResult;
-            //
-            console.log(result)
-            //
             self.postMessage({ id, result });
         } else if (e.data.type === "cpu") {
             const { board, isBlack, timeLimitMs, seed } = e.data;
