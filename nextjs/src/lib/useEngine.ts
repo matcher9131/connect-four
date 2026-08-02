@@ -6,7 +6,7 @@ import type { EngineRequest, EngineResponse, MoveResult } from "./engineTypes";
 type Pending = {
     readonly resolve: (result: MoveResult) => void;
     readonly reject: (error: Error) => void;
-}
+};
 
 export function useEngine() {
     const workerRef = useRef<Worker | null>(null);
@@ -23,8 +23,11 @@ export function useEngine() {
 
     const getWorker = useCallback(() => {
         if (workerRef.current == null) {
-            const worker = new Worker(new URL("/engine.worker.ts", import.meta.url), { type: "module" });
+            const worker = new Worker(new URL("./engine.worker.ts", import.meta.url), { type: "module" });
             worker.onmessage = (e: MessageEvent<EngineResponse>) => {
+                //
+                console.log(e.data)
+                //
                 const pending = pendingRef.current.get(e.data.id);
                 if (pending == null) return;
                 pendingRef.current.delete(e.data.id);
@@ -52,21 +55,44 @@ export function useEngine() {
         rejectAll(new Error("Engine worker terminated"));
     }, [rejectAll]);
 
-    return useCallback((
+    const putPiece = useCallback((
         board: Uint8Array,
-        cpuIsBlack: boolean,
+        isBlack: boolean,
+        colIndex: number
+    ) => new Promise<MoveResult>((resolve, reject) => {
+        const id = ++sequenceRef.current;
+        pendingRef.current.set(id, { resolve, reject });
+        const request: EngineRequest = {
+            type: "human",
+            id,
+            board,
+            isBlack,
+            colIndex
+        };
+        getWorker().postMessage(request);
+    }), [getWorker]);
+
+    const getNextBoardByCpu = useCallback((
+        board: Uint8Array,
+        isBlack: boolean,
         timeLimitMs: number,
         seed: number
     ) => new Promise<MoveResult>((resolve, reject) => {
         const id = ++sequenceRef.current;
         pendingRef.current.set(id, { resolve, reject });
         const request: EngineRequest = {
+            type: "cpu",
             id,
             board,
-            cpuIsBlack,
+            isBlack,
             timeLimitMs,
             seed
         };
         getWorker().postMessage(request);
     }), [getWorker]);
+
+    return {
+        putPiece,
+        getNextBoardByCpu
+    };
 }

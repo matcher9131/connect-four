@@ -3,13 +3,24 @@ export type MoveResult = {
     readonly game_result: number;
 };
 
-export type EngineRequest = {
+type EngineRequestHuman = {
+    readonly type: "human";
     readonly id: number;
     readonly board: Uint8Array;
-    readonly cpuIsBlack: boolean;
+    readonly isBlack: boolean;
+    readonly colIndex: number;
+};
+
+type EngineRequestCpu = {
+    readonly type: "cpu";
+    readonly id: number;
+    readonly board: Uint8Array;
+    readonly isBlack: boolean;
     readonly timeLimitMs: number;
     readonly seed: number;
-};
+}
+
+export type EngineRequest = EngineRequestHuman | EngineRequestCpu
 
 type EngineResponseSuccess = {
     readonly id: number;
