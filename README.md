@@ -65,17 +65,15 @@ npm run dev
 ### Rust → WASMビルド（コンテナ内）
 
 ```bash
-# 開発ビルド
-cd /app/rust-wasm
-wasm-pack build --target web --out-dir pkg
-
-# または Next.jsディレクトリから
+# Next.jsディレクトリから
 cd /app/nextjs
 npm run wasm:build
 
 # リリースビルド（最適化）
 npm run wasm:build:release
 ```
+
+※ Next.js側からの呼び出しの際にファイルコピーが必要な設定になっているため（エラー回避）、rust-wasm側でビルドするのは非推奨
 
 ### Rustテストの実行（コンテナ内）
 

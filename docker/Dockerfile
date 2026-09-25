@@ -34,6 +34,10 @@ COPY nextjs ./
 # Copy WASM build from rust-builder
 COPY --from=rust-builder /build/rust-wasm/pkg ./public/wasm
 
+# Also copy the WASM package next to nextjs/ (as in the local monorepo layout)
+# so the TypeScript type import in src/lib/wasm.ts resolves during `npm run build`
+COPY --from=rust-builder /build/rust-wasm/pkg /build/rust-wasm/pkg
+
 # Build Next.js
 RUN npm run build
 
